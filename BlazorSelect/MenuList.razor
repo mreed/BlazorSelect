@@ -1,0 +1,11 @@
+<div contenteditable="true" @ref="menuListRef" style="@css">
+    @ChildContent
+</div>
+
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    public ElementReference menuListRef { get; set; }
+    private string css = "max-height:300px;overflow-y:auto;padding-bottom:8px;padding-top:8px;position:relative;";
+}

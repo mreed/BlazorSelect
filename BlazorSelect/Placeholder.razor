@@ -1,0 +1,13 @@
+<div style="@css">
+    @ChildContent
+</div>
+
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    private string css = "color: hsl(0,0%,50%); margin-left:2px;margin-right:2px;position:absolute;top:50%;transform: translateY(-50%)";
+    
+
+    
+}

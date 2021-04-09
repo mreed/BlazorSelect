@@ -1,0 +1,375 @@
+﻿@using System.Collections.Generic
+@inject IJSRuntime JS;
+@inherits SelectBase
+<CascadingValue Value="isFocused" Name="isFocused">
+    <CascadingValue Value="isDisabled" Name="isDisabled">
+        <CascadingValue Value="IndicatorDownClicked" Name="IndicatorDownClicked">
+            <SelectContainer oninput="@KeyDown" onLostFocus="FocusLost" onFocus="Focused">
+                <Control @onclick="OnControlClicked" @onblur="FocusLost">
+                    <ValueContainer>
+                        @if (hasValue())
+                        {
+                            if (isMulti)
+                            {
+                                @foreach (var opt in selectValues)
+                                {
+                                    <MultiValue @key="opt" onRemove="@onRemoveValue" data="@opt">@opt.label</MultiValue>
+                                }
+                            }
+                            else if (string.IsNullOrWhiteSpace(inputValue))
+                            {
+                                <SingleValue data="@selectValues[0]">@selectValues[0].label</SingleValue>
+                            }
+                        }
+                        else { }
+
+                        <Input @ref="inputRef" value="@inputValue" OnValueChange="@OnSearchValueChange" />
+                    </ValueContainer>
+                    <IndicatorsContainer>
+                        @if (isClearable() && hasValue())
+                        {
+                            <ClearIndicator @onmousedown="onClearIndicatorMouseDown"
+                                            @ontouchend="onClearIndicatorTouchEnd"
+                                            aria-hidden='@true' />
+
+                        }
+                        <IndicatorSeparator />
+                        <DropdownIndicator @onmousedown="onDropdownIndicatorMouseDown" @ontouchend="onDropDownIndicatorTouchEnd" />
+                    </IndicatorsContainer>
+                </Control>
+                @if (menuIsOpen)
+                {
+                    <Menu>
+                        <MenuList @ref="menuListRef">
+                            @if (!hasOptions() && hasInputValue())
+                            {
+                                <p>No Match for @inputValue</p>
+                            }
+                            else if (!hasOptions() && !hasInputValue())
+                            {
+                                <p>No options</p>
+                            }
+                            else
+                            {
+                                @foreach (var i in filteredOptions)
+                                {
+                                    <Option data="@i" @key="i"
+                                            label="@i.label" value="@i.value"
+                                            onselect="@onSelect"
+                                            onhover="@onOptionHover"
+                                            focus="@(focusedOption == null ? false : focusedOption.value.ToString() == i.value.ToString())">
+                                        @i.label
+                                    </Option>
+                                }
+                            }
+                        </MenuList>
+                    </Menu>
+                }
+
+            </SelectContainer>
+        </CascadingValue>
+    </CascadingValue>
+</CascadingValue>
+
+@code {
+    private bool isFocused { get; set; } = false;
+    [Parameter]
+    public string placeHolder { get; set; }
+    [Parameter]
+    public bool isMulti { get; set; } = false;
+    [Parameter]
+    public bool? clearable { get; set; } = true;
+    [Parameter]
+    public bool controlShouldRenderValue { get; set; } = true;
+    [Parameter]
+    public bool clearInputAfterSelect { get; set; } = true;
+    [Parameter]
+    public List<OptionData> options { get; set; }
+    [Parameter]
+    public EventCallback<List<OptionData>> OnChange { get; set; }
+    private List<OptionData> filteredOptions { get; set; }
+    [Parameter]
+    public bool menuIsOpen { get; set; } = false;
+    [Parameter]
+    public List<OptionData> selectValues { get; set; }
+    [Parameter]
+    public bool isDisabled { get; set; } = false;
+    private OptionData focusedOption { get; set; }
+    public Input inputRef { get; set; }
+    private string inputValue { get; set; }
+    MenuList menuListRef { get; set; }
+    private bool IndicatorDownClicked { get; set; } = false;
+
+    protected override void OnInitialized()
+    {
+        Name = "Select";
+        filteredOptions = GetFilteredOptions();
+        focusedOption = hasOptions() ? filteredOptions[0] : null ;
+        if (selectValues == null)
+        {
+            selectValues = new List<OptionData>();
+        }
+
+    }
+    protected void KeyDown(int keycode)
+    {
+        //Console.WriteLine($"BlazorSelect Keydown key:{e.Key} code:{e.Code}");
+        switch (keycode)
+        {
+            case 13: //enter
+                if (menuIsOpen && focusedOption != null)
+                {
+                    onSelect(focusedOption);
+                    break;
+                }
+                return;
+            case 27: //esc
+                if (menuIsOpen)
+                {
+                    inputValue = "";
+                    menuIsOpen = false;
+                    return;
+                }
+                break;
+            case 38: //up arrow
+                if (menuIsOpen) focusOption("up");
+                else menuIsOpen = true;
+                break;
+            case 40://down arrow
+                if (menuIsOpen) focusOption("down");
+                else menuIsOpen = true;
+                break;
+            default:
+                return;
+        }
+        Console.WriteLine("OnKeyDown\n\n\n\n");
+
+    }
+    private void focusOption(string direction)
+    {
+        if (focusedOption == null || filteredOptions.Count == 0) return;
+
+        var index = filteredOptions.FindIndex(x => x.value == focusedOption.value);
+        if (filteredOptions.Count == 1) { focusedOption = filteredOptions[0]; return; }
+        switch (direction)
+        {
+            case "up":
+                if (index == 0)
+                {
+                    //focusedOption = filteredOptions[filteredOptions.Count - 1];
+                    return;
+                }
+                else
+                {
+                    focusedOption = filteredOptions[index - 1];
+                    return;
+                }
+            case "down":
+                if (index >= (filteredOptions.Count - 1))
+                {
+                    //focusedOption = filteredOptions[0];
+                    break;
+                }
+                else
+                {
+                    focusedOption = filteredOptions[index + 1];
+                    break;
+                }
+            default:
+                return;
+
+        }
+
+    }
+    private bool hasValue()
+    {
+        return selectValues == null ? false : !(selectValues.Count == 0);
+
+    }
+    private bool isClearable()
+    {
+        if (isDisabled) return false;
+        if (!clearable.HasValue) return isMulti;
+        return clearable.Value;
+    }
+    private async void clearValue()
+    {
+        if (isDisabled) return;
+        selectValues.Clear();
+        await OnChange.InvokeAsync(selectValues);
+        inputValue = "";
+
+        //StateHasChanged();
+        //await inputRef.Focus();
+        menuIsOpen = false;
+
+
+
+    }
+    protected  void onClearIndicatorMouseDown(MouseEventArgs e)
+    {
+        if (isDisabled) return;
+        //Console.WriteLine("onClearIndicatorMouse");
+        clearValue();
+
+        filteredOptions = GetFilteredOptions();
+
+        // inputValue = "";
+        //StateHasChanged();
+        Console.WriteLine("onClearIndicatorMouseDown\n\n\n\n");
+
+    }
+    protected void onClearIndicatorTouchEnd(TouchEventArgs e)
+    {
+        //Console.WriteLine("onClearIndicatorTouch");
+        onClearIndicatorMouseDown(null);
+    }
+    protected void onDropdownIndicatorMouseDown(MouseEventArgs e)
+    {
+        if (isDisabled) return;
+        // Console.WriteLine("onDropdownIndicatorMouse");
+        IndicatorDownClicked = true;
+        if (menuIsOpen)
+        {
+            onMenuClose();
+        }
+        else
+        {
+            openMenu("first");
+        }
+        Console.WriteLine("onDropdownIndicatorMouseDown\n\n\n\n");
+    }
+    protected void onDropDownIndicatorTouchEnd(TouchEventArgs e)
+    {
+        //Console.WriteLine("onDropdownIndicatorTouch");
+        onDropdownIndicatorMouseDown(null);
+    }
+    protected async void onSelect(OptionData data)
+    {
+        if (isDisabled) return;
+        // Console.WriteLine("BlazorSelect onSelect called");
+        if (isMulti)
+        {
+            selectValues.Add(data);
+        }
+        else
+        {
+            if (hasValue())
+            {
+                selectValues[0] = data;
+            }
+            else
+            {
+                selectValues.Add(data);
+            }
+        }
+        await OnChange.InvokeAsync(selectValues);
+        if (!isMulti || clearInputAfterSelect)
+        {
+            onMenuClose();
+            inputValue = "";
+            StateHasChanged();
+        }
+        filteredOptions = GetFilteredOptions();
+        Console.WriteLine("onSelect\n\n\n\n");
+    }
+    protected bool hasInputValue()
+    {
+        return !string.IsNullOrWhiteSpace(inputValue);
+    }
+    protected bool hasOptions()
+    {
+        return filteredOptions.Count > 0;
+    }
+    protected void OnSearchValueChange(ChangeEventArgs e)
+    {
+        if (isDisabled) return;
+        //Console.WriteLine("called OnSearchValueChanged");
+        var oldInputValue = inputValue;
+        inputValue = e.Value.ToString();
+        if (inputValue == oldInputValue) return;
+        filteredOptions = GetFilteredOptions();
+        menuIsOpen = true;
+        Console.WriteLine("OnSearchValueChange\n\n\n\n");
+    }
+    private List<OptionData> GetCleanedOptions()
+    {
+        if (options == null || options.Count == 0)
+        {
+            return new List<OptionData>();
+        }
+        if (selectValues.Count > 0)
+        {
+            var cleanlist = options.Where(x => !selectValues.Any(y => y.value == x.value)).Select(x => x.Clone()).ToList();
+            return cleanlist;
+        }
+        else
+        {
+            return options.Select(x => x.Clone()).ToList();
+        }
+    }
+    private List<OptionData> GetFilteredOptions()
+    {
+        var opts = GetCleanedOptions();
+        if (string.IsNullOrWhiteSpace(inputValue)) return opts;
+        var searchValue = inputValue.ToLower();
+
+        var result = opts.Where(x => x.label.ToLower().Contains(searchValue)).ToList();
+        if (result.Count > 0) { focusedOption = result[0]; }
+        else { focusedOption = null;  }
+        return result;
+
+    }
+    protected async void onRemoveValue(OptionData removedOption)
+    {
+        if (isDisabled) return;
+        selectValues = selectValues.Where(x => x.value != removedOption.value).ToList();
+        await OnChange.InvokeAsync(selectValues);
+        filteredOptions = GetFilteredOptions();
+        Console.WriteLine("OnRemoveValue\n\n\n\n");
+        StateHasChanged();
+
+    }
+    protected void onOptionHover(OptionData data)
+    {
+        if (isDisabled) return;
+        focusedOption = data;
+        Console.WriteLine("OnOptionHover\n\n\n\n");
+    }
+    protected void onMenuClose()
+    {
+        menuIsOpen = false;
+    }
+    protected void openMenu(string type)
+    {
+        if (type == "first")
+        {
+            focusedOption = filteredOptions?[0];
+        }
+        menuIsOpen = true;
+    }
+    protected async void OnControlClicked(MouseEventArgs e)
+    {
+        if(IndicatorDownClicked) { IndicatorDownClicked = false; return; }
+        if (isDisabled) return;
+
+        //Console.WriteLine("Control Clicked");
+        await inputRef.Focus();
+        isFocused = true;
+        // StateHasChanged();
+        Console.WriteLine("OnControlClicked\n\n\n\n");
+    }
+    protected void Focused()
+    {
+        Console.WriteLine("Select gained Focus");
+        isFocused = true;
+        // StateHasChanged();
+    }
+    protected void FocusLost()
+    {
+        Console.WriteLine("Select lost Focus");
+        isFocused = false;
+        menuIsOpen = false;
+        //StateHasChanged();
+    }
+}

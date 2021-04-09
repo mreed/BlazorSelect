@@ -1,0 +1,32 @@
+
+<Styled @bind-Classname="BlazorSelect_ClearIndicator">
+   display:flex;
+    padding:8px;
+    color: hsl(0,0%,60%);
+    transition:color 150ms;
+    &:hover {
+        hsl(0,0%,80%);
+    }
+</Styled>
+<div @attributes="InputAttributes" @onmousedown="onMouseDown" @ontouchend="OnTouchEnd" style="@BlazorSelect_ClearIndicator">
+ <CrossIcon size="20" /> 
+</div>
+
+
+@code {
+    private string BlazorSelect_ClearIndicator;
+    [Parameter(CaptureUnmatchedValues= true)]
+    public Dictionary<string,object> InputAttributes { get; set; }
+    [Parameter]
+    public EventCallback<MouseEventArgs> onmousedown {get; set;}
+    [Parameter]
+    public EventCallback<TouchEventArgs> ontouchend {get; set;}
+    public string css ="";
+
+    protected async void onMouseDown(MouseEventArgs e){
+        await onmousedown.InvokeAsync(e);
+    }
+    protected async void OnTouchEnd(TouchEventArgs e){
+        await ontouchend.InvokeAsync(e);
+    }
+}

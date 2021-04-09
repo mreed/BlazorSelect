@@ -1,0 +1,32 @@
+﻿@page "/"
+
+<div style="max-width:400px">
+<BlazorSelect.Select isMulti="true" OnChange="@ColorChanged" selectValues="@values" options="@options"   />
+</div>
+
+
+@code { 
+    private List<BlazorSelect.OptionData> values { get; set; }
+    private List<BlazorSelect.OptionData> options { get; set; }
+
+    protected override void OnInitialized()
+    {
+        values = new List<BlazorSelect.OptionData>();
+        values.Add(new BlazorSelect.OptionData() { label = "Red", value = "red" });
+
+        options = new List<BlazorSelect.OptionData>();
+        options.Add(new BlazorSelect.OptionData() { label = "Green", value = "green" });
+        options.Add(new BlazorSelect.OptionData() { label = "Blue", value = "blue" });
+        options.Add(new BlazorSelect.OptionData() { label = "Yellow", value = "yellow" });
+        options.Add(new BlazorSelect.OptionData() { label = "Purple", value = "purple" });
+        options.Add(new BlazorSelect.OptionData() { label = "Orange", value = "Orange" });
+        options.Add(new BlazorSelect.OptionData() { label = "Red", value = "Red" });
+        options.Add(new BlazorSelect.OptionData() { label = "Black", value = "black" });
+
+        base.OnInitialized();
+
+    }
+    protected void ColorChanged(List<BlazorSelect.OptionData> selected) {
+        values = selected;
+    }
+}

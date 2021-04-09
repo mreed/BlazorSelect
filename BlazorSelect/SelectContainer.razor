@@ -1,0 +1,63 @@
+
+@inject IJSRuntime JS;
+@inherits SelectBase
+<div @ref="containerRef" @onfocusin="FocusIn" @onfocusout="FocusOut" style="@css">
+    @ChildContent
+</div>
+
+@code {
+    [CascadingParameter(Name = "IndicatorDownClicked")]
+    public bool IndicatorDownClicked { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    public ElementReference containerRef { get; set; }
+    [Parameter]
+    public EventCallback onLostFocus { get; set; }
+    [Parameter]
+    public EventCallback onFocus { get; set; }
+    [Parameter]
+    public EventCallback<int> oninput { get; set; }
+
+    private string css = "position:relative;";
+    private DotNetObjectReference<SelectContainer> objRef { get; set; }
+    protected override void OnInitialized()
+    {
+        Name = "SelectContainer";
+        base.OnInitialized();
+    }
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            objRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("BlazorSelect.getKey", objRef, containerRef);
+        }
+    }
+    protected async void FocusIn()
+    {
+        Console.WriteLine("FocusIn\n\n\n\n");
+        Console.WriteLine("SelectContainer focus in");
+
+        await onFocus.InvokeAsync();
+    }
+    protected async void FocusOut()
+    {
+        if (IndicatorDownClicked) return;
+        bool hasActiveChild = await JS.InvokeAsync<bool>("BlazorSelect.hasActiveChild", containerRef);
+        if (hasActiveChild)
+        { Console.WriteLine("has active child");
+            return;
+        }
+        Console.WriteLine("SelectContainer focus out");
+        Console.WriteLine("FocusOut\n\n\n\n");
+        await onLostFocus.InvokeAsync();
+    }
+    [JSInvokable("onkeydown")]
+    public async void Keydown(int keycode)
+    {
+        Console.WriteLine($"selected container {keycode} got in Keydown ");
+        await oninput.InvokeAsync(keycode);
+    }
+        
+}

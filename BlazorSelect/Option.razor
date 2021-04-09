@@ -1,0 +1,38 @@
+<Styled @bind-Classname="BlazorSelect_option">
+    cursor:default;
+    padding-left:3px;
+    background-color: @(Focus ? "#DEEBFF" : "transparent")
+</Styled>
+<div  contenteditable="true" @onclick="OnClick" @onmouseover="OnMouseOver" class="@BlazorSelect_option" @attributes="Attributes">
+    @ChildContent
+</div>
+
+@code {
+    private string BlazorSelect_option;
+    [Parameter(CaptureUnmatchedValues= true)]
+    public Dictionary<string,object> Attributes { get; set; }
+    [Parameter]
+    public OptionData data { get; set; }
+    [Parameter]
+    public bool isDisabled { get; set; }
+    [Parameter]
+    public bool isSelected { get; set; }
+    [Parameter]
+    public string label { get; set; }
+    [Parameter]
+    public object value { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public EventCallback<OptionData> onselect { get; set; }
+    [Parameter]
+    public EventCallback<OptionData> onhover { get; set; }
+    [Parameter]
+    public bool Focus { get; set; } = false;
+    protected async void OnClick(MouseEventArgs e){
+        await onselect.InvokeAsync(data);
+    }
+    protected async void OnMouseOver(MouseEventArgs e){
+        await onhover.InvokeAsync(data);
+    }
+}

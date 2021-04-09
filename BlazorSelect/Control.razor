@@ -1,0 +1,60 @@
+@inherits SelectBase
+<Styled @bind-Classname="BlazorSelect_control">
+    align-items: center;
+    background-color:@(isDisabled ? "hsl(0, 0 %, 50 %)" : "hsl(0,0%,100%)");
+    border-color:@(isDisabled ? "hsl(0,0%,90%)" : isFocused ? "#2684FF" : "hsl(0,0%,80%)");
+    border-radius:6px;
+    border-style:solid;
+    border-width:1px;
+    box-shadow: @(isFocused ? "0 0 0 1px #2684FF" : "");
+    cursor:default;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:space-between;
+    min-height:38px;
+    outline:0 !important;
+    position:relative;
+    transition: all 100ms;
+    &:hover {
+        border-color: @(isFocused ? "#2684FF" : "hsl(0,0%,70%)");
+    }
+
+</Styled>
+
+<div class="@BlazorSelect_control" @onclick="OnClick">
+    @ChildContent
+</div>
+
+@code {
+    [CascadingParameter(Name ="isFocused")]
+    public bool isFocused { get; set; }
+    [CascadingParameter(Name ="isDisabled")]
+    public bool isDisabled { get; set; }
+    [CascadingParameter(Name = "IndicatorDownClicked")]
+    public bool IndicatorDownClicked { get; set; }
+    private string BlazorSelect_control;
+    [Parameter]
+    public EventCallback<MouseEventArgs> onclick { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public EventCallback<FocusEventArgs> onblur { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Name = "Control";
+        //Style.WithId("BlazorSelect")
+        //    .Css("BlazorSelect_Control",)
+        base.OnInitialized();
+    }
+    protected async Task OnClick(MouseEventArgs e)
+    {
+        await onclick.InvokeAsync(e);
+    }
+    protected override bool ShouldRender()
+    {
+        if (IndicatorDownClicked) return false;
+        return base.ShouldRender();
+    }
+    //private string css = "align-items:center; background-color:hsl(0,0%,100%);border-color:hsl(0,0%,80%);border-radius:6px;border-style:solid;border-width:1px;cursor:default;display:flex;flex-wrap:wrap;justify-content:space-between;min-height:38px;outline:0 !important;position:relative;transition: all 100ms";
+}

@@ -1,0 +1,20 @@
+<Styled @bind-Classname="@BlazorSelect_menu">
+    background-color:hsl(0,0%,100%);
+    border-radius:6px;
+    box-shadow:0 0 0 1px hsla(0, 0%, 0%, 0.1), 0 4px 11px hsla(0, 0%, 0%, 0.1);
+    margin-bottom:5px;
+    margin-top:5px;
+    position:absolute;
+    width:100%;
+    z-index:10;
+</Styled>
+<div contenteditable="true" class="@BlazorSelect_menu">
+    @ChildContent
+</div>
+
+@code {
+    private string BlazorSelect_menu;
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    public string css = "";
+}

@@ -1,0 +1,113 @@
+﻿@inject IJSRuntime JS
+@inherits SelectBase
+<div>
+    <input  @oninput="OnInputChanged" disabled="@isDisabled" value="@value"  style="@inputStyle" @ref="inputRef" />
+    <div class="sizerStyle" @ref='sizerRef'>@sizerValue</div>
+</div>
+
+
+
+@code {
+    [CascadingParameter(Name ="isDisabled")]
+    public bool isDisabled { get; set; }
+    [CascadingParameter(Name = "IndicatorDownClicked")]
+    public bool IndicatorDownClicked { get; set; }
+    [Parameter]
+    public ElementReference inputRef { get; set; }
+    [Parameter]
+    public ElementReference sizerRef { get; set; }
+    [Parameter]
+    public string value { get; set; }
+    [Parameter]
+    public EventCallback<string> valueChanged {get; set;}
+    [Parameter]
+    public EventCallback<ChangeEventArgs> OnNewInput { get; set; }
+    [Parameter]
+    public int? minWidth { get; set; }
+    private int calculatedMinWidth { get; set; }
+    private string sizerValue { get; set; }
+    private int inputWidth { get; set; }
+    private string inputStyle { get; set; }
+    private bool mounted = false;
+    private int buffer = 20;
+    protected override void OnInitialized()
+    {
+        this.Name = "AutoSize";
+        //Console.WriteLine("AutoSize OnInitialized");
+        calculatedMinWidth = minWidth.HasValue ? minWidth.Value + buffer : 3 + buffer;
+        inputWidth = calculatedMinWidth;
+        SetInputStyle();
+        base.OnInitialized();
+    }
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        mounted = true;
+        //Console.WriteLine("AutoSize OnAfterRenderAsync");
+
+        // await updateInputWidth();
+        await base.OnAfterRenderAsync(firstRender);
+
+    }
+    protected async  override Task OnParametersSetAsync()
+    {
+        //Console.WriteLine("AutoSize OnParametersSetAsync");
+        //UpdateSizerValue();
+        //await updateInputWidth();
+        await base.OnParametersSetAsync();
+
+    }
+    protected async Task updateInputWidth()
+    {
+        //Console.WriteLine("called autosize updateInputWidth");
+        if (!mounted)
+            return;
+
+        var sizerScrollWidth = await JS.InvokeAsync<int>("BlazorSelect.getScrollWidth", sizerRef);
+        //Console.WriteLine($"SizerScrollWidth = {sizerScrollWidth}");
+        //var oldInputWidth = inputWidth;
+        //if (sizerScrollWidth - oldInputWidth > 10) sizerScrollWidth = oldInputWidth + 10;
+        var newInputWidth = sizerScrollWidth + buffer;
+        if (newInputWidth < calculatedMinWidth){
+            newInputWidth = calculatedMinWidth;}
+        //else {
+        //    newInputWidth = sizerScrollWidth;
+        //}
+        if (newInputWidth != inputWidth)
+        {
+            //Console.WriteLine($"Changing inputWidth newWidth = {newInputWidth}, current Input Width = {inputWidth}");
+            inputWidth = newInputWidth;
+            SetInputStyle();
+            //await JS.InvokeVoidAsync("BlazorSelect.changeWidth", inputRef,inputWidth);
+            //StateHasChanged();
+        }
+
+    }
+    private void SetInputStyle()
+    {
+        inputStyle = $"box-sizing:content-box;width:{inputWidth}px;border:0;outline:0;padding-left:5px;padding-right:5px;text-indent:2px;";
+    }
+    private async Task OnInputChanged(ChangeEventArgs e)
+    {
+        Console.WriteLine("AutoSize OnInputChanged");
+        sizerValue = e.Value.ToString();
+        //UpdateSizerValue();
+        await updateInputWidth();
+        value = e.Value.ToString();
+        await valueChanged.InvokeAsync(value);
+        await OnNewInput.InvokeAsync(e);
+    }
+
+
+    public async Task Focus()
+    {
+        //await JS.InvokeVoidAsync("BlazorSelect.focusElement", inputRef);
+        await inputRef.FocusAsync();
+    }
+
+    protected override bool ShouldRender()
+    {
+        if (IndicatorDownClicked) return false;
+        return base.ShouldRender();
+    }
+
+}

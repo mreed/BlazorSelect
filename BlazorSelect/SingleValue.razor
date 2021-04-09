@@ -1,0 +1,29 @@
+<Styled @bind-Classname="BlazorSelect_singlevalue">
+    color:hsl(0,0%,40%);
+    margin-left:6px;
+    margin-right:2px;
+    overflow:hidden;
+    position:absolute;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    top:50%;
+    transform:translateY(-50%);
+</Styled>
+<div class="@BlazorSelect_singlevalue">
+    @ChildContent
+</div>
+
+@code {
+    [CascadingParameter(Name = "IndicatorDownClicked")]
+    public bool IndicatorDownClicked { get; set; }
+    private string BlazorSelect_singlevalue;
+    [Parameter]
+    public OptionData data { get; set; }
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    protected override bool ShouldRender()
+    {
+        if (IndicatorDownClicked) return false;
+        return base.ShouldRender();
+    }
+}

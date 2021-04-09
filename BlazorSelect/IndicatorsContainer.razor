@@ -1,0 +1,9 @@
+<div style="@css">
+    @ChildContent
+</div>
+
+@code {
+[Parameter]
+public RenderFragment ChildContent { get; set; }    
+public string css = "align-items:center;align-self:stretch;display:flex;flex-shrink:0";
+}
