@@ -1,8 +1,10 @@
 # BlazorSelect
 Is a port of Jed Watson's ReactSelect to Blazor
 
+Target Platform: .net 5
+
 ## To Use in your Project:
-- Blazor Server: Add services.AddBlazorStyled(); to Startup.cs under ConfigureServies 
+- Blazor Server: Add services.AddBlazorStyled(); to Startup.cs under ConfigureServices 
 - Blazor Client: Add builder.Services.AddBlazorStyled(); to Program Main
 
 Add 
