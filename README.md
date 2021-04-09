@@ -36,6 +36,12 @@ Add <script src="_content/BlazorSelect/BlazorSelect.js"></script> to _Host.cshtm
 
 
 
+## Todo
+
+- Add css classes for end users 
+- Add all the events in reactselect
+- Add all the parameters in reactselect
+- Create Nuget Package
 
 
 
