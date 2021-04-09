@@ -5,7 +5,11 @@ Is a port of Jed Watson's ReactSelect to Blazor
 - Blazor Server: Add services.AddBlazorStyled(); to Startup.cs under ConfigureServies 
 - Blazor Client: Add builder.Services.AddBlazorStyled(); to Program Main
 
-Add <link href="_content/BlazorSelect/BlazorSelect.bundle.scp.css" rel="stylesheet"> to _Host.cshtml or to index
+Add 
+
+    <link href="_content/BlazorSelect/BlazorSelect.bundle.scp.css" rel="stylesheet"> 
+    
+to _Host.cshtml or to index
 
 Add <script src="_content/BlazorSelect/BlazorSelect.js"></script> to _Host.cshtml or to index
 
