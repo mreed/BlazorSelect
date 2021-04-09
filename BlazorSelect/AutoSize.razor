@@ -19,8 +19,6 @@
     [Parameter]
     public string value { get; set; }
     [Parameter]
-    public EventCallback<string> valueChanged {get; set;}
-    [Parameter]
     public EventCallback<ChangeEventArgs> OnNewInput { get; set; }
     [Parameter]
     public int? minWidth { get; set; }
@@ -48,14 +46,7 @@
         await base.OnAfterRenderAsync(firstRender);
 
     }
-    protected async  override Task OnParametersSetAsync()
-    {
-        //Console.WriteLine("AutoSize OnParametersSetAsync");
-        //UpdateSizerValue();
-        //await updateInputWidth();
-        await base.OnParametersSetAsync();
-
-    }
+  
     protected async Task updateInputWidth()
     {
         //Console.WriteLine("called autosize updateInputWidth");
@@ -88,12 +79,11 @@
     }
     private async Task OnInputChanged(ChangeEventArgs e)
     {
-        Console.WriteLine("AutoSize OnInputChanged");
+        //Console.WriteLine("AutoSize OnInputChanged");
         sizerValue = e.Value.ToString();
         //UpdateSizerValue();
         await updateInputWidth();
         value = e.Value.ToString();
-        await valueChanged.InvokeAsync(value);
         await OnNewInput.InvokeAsync(e);
     }
 

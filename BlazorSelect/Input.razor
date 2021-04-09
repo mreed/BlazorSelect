@@ -7,7 +7,7 @@
     color: hsl(0,0%,20%);
 </Styled>
 <div class="@BlazorSelect_input">
-    <AutoSize @ref="inputRef"  @bind-value="value" minWidth="40" OnNewInput="@OnInternalInputChange" />
+    <AutoSize @ref="inputRef"  value="@value" minWidth="40" OnNewInput="@OnInternalInputChange" />
 </div>
 
 
@@ -20,8 +20,6 @@
     [Parameter]
     public string value { get; set; }
     [Parameter]
-    public EventCallback<string> valueChanged { get; set; }
-    [Parameter]
     public EventCallback<ChangeEventArgs> OnValueChange { get; set; }
     AutoSize inputRef { get; set; }
 
@@ -33,7 +31,6 @@
 
     protected async void OnInternalInputChange(ChangeEventArgs e) {
         value = e.Value.ToString();
-        await valueChanged.InvokeAsync(value);
         await OnValueChange.InvokeAsync(e);
     }
     public async Task Focus()

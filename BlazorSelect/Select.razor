@@ -133,21 +133,21 @@
                 break;
             case 38: //up arrow
                 if (menuIsOpen) focusOption("up");
-                else menuIsOpen = true;
+                else openMenu("first");
                 break;
             case 40://down arrow
                 if (menuIsOpen) focusOption("down");
-                else menuIsOpen = true;
+                else openMenu("first");
                 break;
             default:
                 return;
         }
-        Console.WriteLine("OnKeyDown\n\n\n\n");
+        //Console.WriteLine("OnKeyDown\n\n\n\n");
 
     }
     private void focusOption(string direction)
     {
-        if (focusedOption == null || filteredOptions.Count == 0) return;
+        if (focusedOption == null || filteredOptions == null || filteredOptions.Count == 0) return;
 
         var index = filteredOptions.FindIndex(x => x.value == focusedOption.value);
         if (filteredOptions.Count == 1) { focusedOption = filteredOptions[0]; return; }
@@ -201,7 +201,7 @@
 
         //StateHasChanged();
         //await inputRef.Focus();
-        menuIsOpen = false;
+        onMenuClose();
 
 
 
@@ -216,7 +216,7 @@
 
         // inputValue = "";
         //StateHasChanged();
-        Console.WriteLine("onClearIndicatorMouseDown\n\n\n\n");
+        //Console.WriteLine("onClearIndicatorMouseDown\n\n\n\n");
 
     }
     protected void onClearIndicatorTouchEnd(TouchEventArgs e)
@@ -227,7 +227,7 @@
     protected void onDropdownIndicatorMouseDown(MouseEventArgs e)
     {
         if (isDisabled) return;
-        // Console.WriteLine("onDropdownIndicatorMouse");
+        // //Console.WriteLine("onDropdownIndicatorMouse");
         IndicatorDownClicked = true;
         if (menuIsOpen)
         {
@@ -237,7 +237,7 @@
         {
             openMenu("first");
         }
-        Console.WriteLine("onDropdownIndicatorMouseDown\n\n\n\n");
+        //Console.WriteLine("onDropdownIndicatorMouseDown\n\n\n\n");
     }
     protected void onDropDownIndicatorTouchEnd(TouchEventArgs e)
     {
@@ -247,7 +247,7 @@
     protected async void onSelect(OptionData data)
     {
         if (isDisabled) return;
-        // Console.WriteLine("BlazorSelect onSelect called");
+        // //Console.WriteLine("BlazorSelect onSelect called");
         if (isMulti)
         {
             selectValues.Add(data);
@@ -271,7 +271,7 @@
             StateHasChanged();
         }
         filteredOptions = GetFilteredOptions();
-        Console.WriteLine("onSelect\n\n\n\n");
+        //Console.WriteLine("onSelect\n\n\n\n");
     }
     protected bool hasInputValue()
     {
@@ -279,7 +279,7 @@
     }
     protected bool hasOptions()
     {
-        return filteredOptions.Count > 0;
+        return filteredOptions == null ? false : filteredOptions.Count > 0;
     }
     protected void OnSearchValueChange(ChangeEventArgs e)
     {
@@ -289,8 +289,8 @@
         inputValue = e.Value.ToString();
         if (inputValue == oldInputValue) return;
         filteredOptions = GetFilteredOptions();
-        menuIsOpen = true;
-        Console.WriteLine("OnSearchValueChange\n\n\n\n");
+        openMenu("first");
+        //Console.WriteLine("OnSearchValueChange\n\n\n\n");
     }
     private List<OptionData> GetCleanedOptions()
     {
@@ -326,7 +326,7 @@
         selectValues = selectValues.Where(x => x.value != removedOption.value).ToList();
         await OnChange.InvokeAsync(selectValues);
         filteredOptions = GetFilteredOptions();
-        Console.WriteLine("OnRemoveValue\n\n\n\n");
+        //Console.WriteLine("OnRemoveValue\n\n\n\n");
         StateHasChanged();
 
     }
@@ -334,7 +334,7 @@
     {
         if (isDisabled) return;
         focusedOption = data;
-        Console.WriteLine("OnOptionHover\n\n\n\n");
+        //Console.WriteLine("OnOptionHover\n\n\n\n");
     }
     protected void onMenuClose()
     {
@@ -342,9 +342,9 @@
     }
     protected void openMenu(string type)
     {
-        if (type == "first")
+        if (type == "first" && filteredOptions != null && filteredOptions.Count > 0)
         {
-            focusedOption = filteredOptions?[0];
+            focusedOption = filteredOptions[0];
         }
         menuIsOpen = true;
     }
@@ -357,19 +357,19 @@
         await inputRef.Focus();
         isFocused = true;
         // StateHasChanged();
-        Console.WriteLine("OnControlClicked\n\n\n\n");
+        //Console.WriteLine("OnControlClicked\n\n\n\n");
     }
     protected void Focused()
     {
-        Console.WriteLine("Select gained Focus");
+        //Console.WriteLine("Select gained Focus");
         isFocused = true;
         // StateHasChanged();
     }
     protected void FocusLost()
     {
-        Console.WriteLine("Select lost Focus");
+        //Console.WriteLine("Select lost Focus");
         isFocused = false;
-        menuIsOpen = false;
+        onMenuClose();
         //StateHasChanged();
     }
 }

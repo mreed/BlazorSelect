@@ -13,13 +13,13 @@ namespace BlazorSelect
 
         public void Dispose()
         {
-            Console.WriteLine($"{Name} Dispose");
+            //Console.WriteLine($"{Name} Dispose");
         }
 
         protected override void OnAfterRender(bool firstRender)
         {
             base.OnAfterRender(firstRender);
-           // Console.WriteLine($"{Name} OnAfterRender");
+           // //Console.WriteLine($"{Name} OnAfterRender");
         }
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
@@ -29,7 +29,7 @@ namespace BlazorSelect
         protected override void OnInitialized()
         {
             //Console.WriteLine("\n***********************************");
-           // Console.WriteLine($"{Name} OnInitialized");
+           // //Console.WriteLine($"{Name} OnInitialized");
             base.OnInitialized();
         }
         protected override Task OnInitializedAsync()
@@ -53,7 +53,7 @@ namespace BlazorSelect
             //Console.WriteLine($"{Name} SetParametersAsync");
             //foreach (var p in parameters)
             //{
-            //    Console.WriteLine($"     {p.Name} = {p.Value}");
+            //    //Console.WriteLine($"     {p.Name} = {p.Value}");
             //}
             return base.SetParametersAsync(parameters);
         }

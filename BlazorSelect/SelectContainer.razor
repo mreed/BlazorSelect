@@ -36,8 +36,8 @@
     }
     protected async void FocusIn()
     {
-        Console.WriteLine("FocusIn\n\n\n\n");
-        Console.WriteLine("SelectContainer focus in");
+        //Console.WriteLine("FocusIn\n\n\n\n");
+        //Console.WriteLine("SelectContainer focus in");
 
         await onFocus.InvokeAsync();
     }
@@ -46,17 +46,17 @@
         if (IndicatorDownClicked) return;
         bool hasActiveChild = await JS.InvokeAsync<bool>("BlazorSelect.hasActiveChild", containerRef);
         if (hasActiveChild)
-        { Console.WriteLine("has active child");
+        { //Console.WriteLine("has active child");
             return;
         }
-        Console.WriteLine("SelectContainer focus out");
-        Console.WriteLine("FocusOut\n\n\n\n");
+        //Console.WriteLine("SelectContainer focus out");
+        //Console.WriteLine("FocusOut\n\n\n\n");
         await onLostFocus.InvokeAsync();
     }
     [JSInvokable("onkeydown")]
     public async void Keydown(int keycode)
     {
-        Console.WriteLine($"selected container {keycode} got in Keydown ");
+        //Console.WriteLine($"selected container {keycode} got in Keydown ");
         await oninput.InvokeAsync(keycode);
     }
         
