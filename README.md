@@ -3,6 +3,10 @@ Is a port of Jed Watson's ReactSelect to Blazor
 
 Target Platform: .net 5
 
+![Alt text](/ServerSample/wwwroot/sample_images/example2.png?raw=true "example of multi value dropdown")
+
+![Alt text](/ServerSample/wwwroot/sample_images/example3.png?raw=true "example of single value dropdown")
+
 ## To Use in your Project:
 - Blazor Server: Add services.AddBlazorStyled(); to Startup.cs under ConfigureServices 
 - Blazor Client: Add builder.Services.AddBlazorStyled(); to Program Main
