@@ -37,7 +37,7 @@ Add
     [Parameter]
     public bool isDisabled { get; set; } = false; // is component disabled
     [Parameter]
-    public bool isMulti {get; set; } = flase; // does component take multiple values
+    public bool isMulti {get; set; } = false; // does component take multiple values
 
 
 
