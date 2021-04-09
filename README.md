@@ -1,17 +1,20 @@
 # BlazorSelect
 Is a port of Jed Watson's ReactSelect to Blazor
 
+Target Platform: .net 5
+
 ## To Use in your Project:
-- Blazor Server: Add services.AddBlazorStyled(); to Startup.cs under ConfigureServies 
+- Blazor Server: Add services.AddBlazorStyled(); to Startup.cs under ConfigureServices 
 - Blazor Client: Add builder.Services.AddBlazorStyled(); to Program Main
 
 Add 
 
     <link href="_content/BlazorSelect/BlazorSelect.bundle.scp.css" rel="stylesheet"> 
     
-to _Host.cshtml or to index
+## In _Host.cshtml or to index.html
 
-Add <script src="_content/BlazorSelect/BlazorSelect.js"></script> to _Host.cshtml or to index
+Add 
+`<script src="_content/BlazorSelect/BlazorSelect.js"></script>`
 
 
 ## To Use
@@ -33,6 +36,8 @@ Add <script src="_content/BlazorSelect/BlazorSelect.js"></script> to _Host.cshtm
     public List<OptionData> selectValues { get; set; } //currently selected values is  List<OptionData>
     [Parameter]
     public bool isDisabled { get; set; } = false; // is component disabled
+    [Parameter]
+    public bool isMulti {get; set; } = false; // does component take multiple values
 
 
 
@@ -41,6 +46,8 @@ Add <script src="_content/BlazorSelect/BlazorSelect.js"></script> to _Host.cshtm
 - Add css classes for end users 
 - Add all the events in reactselect
 - Add all the parameters in reactselect
+- Add placeholder
+- Add scrollToView when selected option in dropdown changes
 - Create Nuget Package
 
 
